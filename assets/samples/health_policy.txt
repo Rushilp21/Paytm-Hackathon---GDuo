@@ -1,0 +1,10 @@
+FICTIONAL FINPATH HEALTH POLICY — FOR DEMONSTRATION ONLY
+Full Name: Aarav Sharma
+Policy Number: DEMO-HEALTH-2026
+Health Cover: INR 300000
+This sample policy has a 30-day initial waiting period except for accidents.
+The policy has a 10% co-pay on admissible hospitalisation expenses.
+Room rent is limited to INR 3000 per day.
+Non-medical consumables are excluded from this fictional policy.
+Cashless claims require pre-authorisation from the insurer.
+Coverage of any treatment must be assessed against the complete policy wording.

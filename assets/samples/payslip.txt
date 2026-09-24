@@ -1,0 +1,8 @@
+FINPATH FICTIONAL DEMO PAYSLIP
+Full Name: Aarav Sharma
+Employer: Acme Studio
+Email: aarav@example.com
+Net Salary: INR 75000
+Monthly Expenses: INR 32000
+Existing EMI: INR 8500
+Available Savings: INR 180000

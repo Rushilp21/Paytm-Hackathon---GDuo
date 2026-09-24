@@ -1,0 +1,9 @@
+FICTIONAL DEMO LOAN AGREEMENT
+Principal: INR 107000
+The annual interest rate is 9.5% on a reducing balance.
+Repayment tenure is 36 months.
+A processing fee of INR 1500 is payable at origination.
+Late payment attracts a penalty of INR 500 per missed instalment.
+Prepayment is permitted after 6 months with a fee of 2% of the outstanding principal.
+Default may lead to recovery of the vehicle held as collateral.
+The borrower must maintain vehicle insurance during the loan tenure.

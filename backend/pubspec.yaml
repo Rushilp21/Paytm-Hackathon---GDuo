@@ -1,0 +1,5 @@
+name: finpath_backend
+description: Local Dart Gemini proxy. Keeps credentials out of Flutter builds.
+publish_to: none
+environment:
+  sdk: ^3.11.0
