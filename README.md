@@ -1,132 +1,396 @@
 # FINPATH
 
-**Bigger tomorrows start here.** A Flutter + Dart hackathon prototype for **AI-Powered Financial Journeys**: make insurance, lending and fintech simpler, faster and more human.
+> **Bigger tomorrows start here.**
 
-Responsive Android / iOS / web app, a local Dart Gemini proxy, persistent demo state, and transparent financial calculations. The UI uses the supplied FINPATH concepts as inspiration, with a desktop workspace and adaptive mobile layout.
+FINPATH is an AI-powered financial journey companion built for the **AI-Powered Financial Journeys** hackathon track. It makes lending, insurance and personal-finance journeys easier to understand, compare and complete.
 
-Built outputs are in `build/web/` and `build/app/outputs/flutter-apk/app-debug.apk`. To serve the compiled web app without a rebuild, run `dart tool/serve_web.dart` from this directory and open `http://127.0.0.1:5180`.
+Instead of asking users to search through financial products, FINPATH begins with a life goal. It builds a financial profile, checks affordability, explains trade-offs, processes documents with user review, prepares applications or insurance claims, and keeps the user informed throughout the journey.
 
-## Run it
+The prototype is built with **Flutter and Dart**, runs on Android and web, and uses a local Dart backend as a secure proxy for the **Google Gemini API**. Core calculations and demo journeys continue to work without an API key.
 
-For a physical Android phone or emulator, follow [the Android quickstart](docs/ANDROID_QUICKSTART.md). A USB helper is included: `./scripts/run_android.ps1 -DeviceId "YOUR_DEVICE_ID"`.
+## Problem Statement
 
-Requires Flutter 3.41+ / Dart 3.11+, Chrome for web, or an Android SDK/emulator. iOS builds require macOS + Xcode.
+**AI-Powered Financial Journeys**
 
-From this project directory:
+Make insurance, lending and fintech simpler, faster and more human. Reimagine customer-facing journeys using AI by removing friction, reducing complexity, and helping customers complete important financial tasks with greater confidence.
+
+## Solution Summary
+
+FINPATH combines financial planning, explainable calculations, document assistance, insurance support and consent controls in one responsive application.
+
+The main journey is:
+
+```text
+Life Goal → Financial Profile → Affordable Options → Document Review
+          → Application or Claim → Progress Tracking → Human Support
+```
+
+Key principles:
+
+- Start with the user's goal instead of a product catalogue.
+- Check real affordability instead of showing eligibility alone.
+- Keep EMI and affordability calculations deterministic and explainable.
+- Use Gemini for language and document tasks, not final financial decisions.
+- Require consent and user review before using extracted information.
+- Clearly identify simulated applications, providers and approval stages.
+
+## Features
+
+### 1. Financial Digital Twin
+
+Builds a continuously updated financial profile using income, expenses, savings, existing EMIs, dependents, insurance cover, credit information and goals. The profile is editable and saved locally.
+
+### 2. Goal-to-Product AI
+
+Accepts natural-language goals such as `I want to buy a bike for 1.5 lakh`. Gemini can identify the goal category and stated budget when enabled. A deterministic local parser provides a fallback when AI is unavailable.
+
+### 3. Affordability Engine
+
+Calculates whether a loan fits the user's finances using proposed EMI, total debt-to-income ratio, disposable income and emergency savings. It explains why a plan is considered comfortable or risky.
+
+### 4. Explainable Loan Advisor
+
+Explains principal, EMI, interest, total repayment and monthly budget impact in everyday language. The local advisor handles common questions without an API key, while Gemini supports broader conversations.
+
+### 5. Financial What-if Simulator
+
+Lets users change the down payment, repayment period, annual interest rate and potential income reduction. Every change immediately updates EMI, interest, repayment and financial-buffer calculations.
+
+### 6. AI Document Intelligence
+
+Processes labelled TXT and CSV files locally. With Gemini enabled, it can extract supported fields from PDF, PNG and JPEG files up to 5 MB. Extracted information is never treated as verified KYC data.
+
+### 7. Smart Form Autofill
+
+Uses the reviewed document fields to populate the financial profile and application preview. The flow is deliberately `extract → review or correct → confirm → autofill`.
+
+### 8. Eligibility Predictor
+
+Provides a transparent rule-based estimate using the entered income, credit score and existing obligations. It does not claim to provide a real lender approval probability.
+
+### 9. Personalized Insurance Gap Detector
+
+Compares existing health and life cover with clearly labelled planning assumptions. It highlights potential protection gaps without presenting the result as regulated financial advice.
+
+### 10. Claim Copilot
+
+Collects policy, treatment and hospital details, prepares a structured claim draft, maintains a document checklist and provides a simulated claim-progress tracker. Gemini can improve the draft when consent is enabled.
+
+### 11. Financial Scam Detector
+
+Flags suspicious requests for credentials, advance payments, urgent transfers, guaranteed approvals and unofficial communication channels. It identifies warning signs without certifying a message as safe.
+
+### 12. Multilingual Voice Finance Agent
+
+Supports speech-to-text, typed input and read-aloud responses. The interface includes English, Hindi, Marathi, Tamil and Telugu language selection, with local English and Hindi starter responses.
+
+### 13. Explain My Contract
+
+Scans pasted financial agreements for important clauses involving interest, penalties, exclusions, auto-debit and obligations. Gemini can produce a more detailed plain-language explanation when enabled.
+
+### 14. Consent Dashboard
+
+Shows whether document, AI and voice access are enabled, records why data was used, and lets users revoke consent. Users can export or reset their locally saved prototype data.
+
+### 15. Human Escalation Agent
+
+Creates a reviewable, copyable advisor summary containing the user's profile, goal, affordability risks and recent conversation context. The prototype does not connect to a live advisor service.
+
+### 16. Application and Journey Tracking
+
+Creates an immutable demo snapshot of the profile and selected goal, then displays simulated application, assessment, approval and disbursal stages. Later profile changes do not modify an already-created snapshot.
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Application | Flutter 3.41+, Dart 3.11+, Material 3 |
+| Platforms | Android, web and iOS-ready scaffolding |
+| State management | `ChangeNotifier` and `AnimatedBuilder` |
+| Local persistence | `shared_preferences` |
+| File selection | `file_picker` |
+| Networking | Dart `http` package |
+| Backend | Dart `dart:io` HTTP server |
+| Generative AI | Google Gemini GenerateContent API |
+| Voice input | `speech_to_text` |
+| Voice output | `flutter_tts` |
+| Formatting | `intl` |
+| Testing | `flutter_test` and Dart backend smoke tests |
+
+## Architecture
+
+FINPATH uses a feature-first structure with a small shared application store:
+
+```text
+UI action
+   ↓
+AppStore
+   ├── FinanceEngine / local parsers
+   ├── AiService → Dart backend → Gemini
+   └── SharedPreferences
+   ↓
+notifyListeners
+   ↓
+Updated UI
+```
+
+- `domain/` contains models, calculations and local parsers without Flutter dependencies.
+- `data/` manages application state, persistence, consent, snapshots and API calls.
+- `features/` contains the individual user journeys.
+- `ui/` contains the shared theme and responsive components.
+- `backend/` protects the Gemini key, validates requests and returns constrained responses.
+
+The Flutter application only receives `API_BASE_URL`. The Gemini API key remains in the backend environment and is never bundled into the APK or web build.
+
+## Project Structure
+
+```text
+finpath/
+├── android/                         # Android platform project
+├── ios/                             # iOS project scaffolding
+├── web/                             # Flutter web entry files
+├── assets/
+│   └── samples/
+│       ├── payslip.txt              # Fictional payslip sample
+│       ├── contract.txt             # Fictional loan contract
+│       └── health_policy.txt         # Fictional policy sample
+├── backend/
+│   ├── bin/server.dart              # Dart Gemini proxy and REST routes
+│   ├── test/server_smoke.dart        # Backend route and security checks
+│   ├── .env.example                 # Environment template
+│   └── pubspec.yaml
+├── lib/
+│   ├── main.dart                    # Bootstrap and local-state restoration
+│   ├── app.dart                     # Responsive shell and navigation
+│   ├── data/
+│   │   ├── app_store.dart           # State, persistence and consent
+│   │   └── ai_service.dart          # Backend API adapter
+│   ├── domain/
+│   │   ├── models.dart              # Financial and journey models
+│   │   ├── finance_engine.dart      # EMI and affordability calculations
+│   │   ├── document_parser.dart     # Conservative local extraction
+│   │   └── local_advisor.dart       # Offline conversational guidance
+│   ├── features/
+│   │   ├── home/                    # Goal entry and financial twin
+│   │   ├── planner/                 # Simulator and product comparison
+│   │   ├── documents/               # Extraction, review and autofill
+│   │   ├── claims/                  # Insurance claim copilot
+│   │   ├── assistant/               # Chat, scam and contract tools
+│   │   ├── journey/                 # Application tracking
+│   │   ├── privacy/                 # Consent and activity history
+│   │   └── profile/                 # Financial profile editing
+│   └── ui/
+│       ├── theme.dart               # Colour, typography and formatting
+│       └── components.dart          # Shared responsive components
+├── scripts/
+│   ├── run_android.ps1              # Android launch and USB forwarding
+│   ├── run_backend.ps1              # Backend launcher
+│   └── run_web.ps1                  # Web launcher
+├── test/                             # Unit, state and widget tests
+├── docs/                             # Architecture and verification guides
+└── pubspec.yaml
+```
+
+## Prerequisites
+
+- Flutter 3.41 or newer
+- Dart 3.11 or newer
+- Android Studio and Android SDK for Android builds
+- Chrome for Flutter web
+- A Gemini API key only for optional AI features
+- macOS and Xcode only if building for iOS
+
+Check the development environment:
 
 ```powershell
+flutter doctor
+flutter devices
+```
+
+## Quick Start Without Gemini
+
+The affordability engine, simulator, sample document flow, local assistant, scam checks, contract scan and demo trackers work without an API key.
+
+```powershell
+cd finpath
 flutter pub get
 flutter run -d chrome --web-port 5173
 ```
 
-**No API key is needed for the local demo.** The sample profile is fictional. Changes persist on this device/browser. Keep a fixed web port to keep the same browser storage origin.
+Use a fixed web port to preserve the same browser-storage origin between runs.
 
-### Turn on Gemini
+## Enable Gemini
 
-1. Open `backend/.env` (already created locally). Paste your key after `GEMINI_API_KEY=`. This file is ignored by Git and is never bundled in Flutter. After a fresh clone, copy `backend/.env.example` to `backend/.env`.
-2. In a **second terminal**, run:
+Create `backend/.env` from the supplied template if it does not already exist:
 
 ```powershell
-cd backend
+Copy-Item backend\.env.example backend\.env
+```
+
+Add the API key:
+
+```dotenv
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3.5-flash-lite
+HOST=127.0.0.1
+PORT=8080
+ALLOWED_ORIGIN=
+```
+
+Start the backend in a separate terminal:
+
+```powershell
+cd finpath\backend
 dart run bin/server.dart
 ```
 
-3. In the app, open **Privacy & consent → Check connection**, then turn on **External AI processing**. Goal matching, PDF/image extraction, open-ended chat, contract explanations and claim drafting now use Gemini.
-4. Restart the backend whenever you change `.env`. No backend packages or database are required.
+Expected output:
 
-The default model is `gemini-3.5-flash-lite`; change `GEMINI_MODEL` to a model available to your API account. Connection status checks configuration, not actual API quota or key validity. Failed calls display actionable errors and never pretend to be AI results.
+```text
+FINPATH backend: http://127.0.0.1:8080
+Gemini configured.
+```
 
-Optional helper scripts: `./scripts/run_backend.ps1` and `./scripts/run_web.ps1`, in separate terminals.
+In FINPATH, open **Privacy & consent**, select **Check connection**, and enable **External AI processing**. Restart the backend after changing `.env`.
 
-### Android
+## Run on a Physical Android Phone
+
+1. Enable **Developer options** and **USB debugging** on the phone.
+2. Connect it with a data-capable USB cable.
+3. Unlock the phone and approve the debugging prompt.
+4. Keep the backend running if Gemini is required.
+5. Open PowerShell in the project directory:
 
 ```powershell
 flutter devices
-flutter run -d <device-id> --dart-define=API_BASE_URL=http://10.0.2.2:8080
+.\scripts\run_android.ps1 -DeviceId "YOUR_DEVICE_ID"
 ```
 
-`10.0.2.2` reaches the host from an Android emulator. For a USB-connected physical Android device, use `adb reverse tcp:8080 tcp:8080` and `--dart-define=API_BASE_URL=http://127.0.0.1:8080`. Local HTTP is enabled only in the Android **debug** manifest. Release builds need an HTTPS backend URL.
+The helper script installs dependencies, creates `adb reverse tcp:8080 tcp:8080`, and launches Flutter with `http://127.0.0.1:8080` as the backend URL.
 
-For a phone on the same Wi-Fi, set backend `HOST=0.0.0.0`, use the computer’s LAN IP in `API_BASE_URL`, and allow port 8080 through your firewall only on a trusted network. The proxy is unauthenticated and intended for local development. Do not expose it publicly.
+Run PowerShell scripts from PowerShell. From Git Bash, use:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass \
+  -File "./scripts/run_android.ps1" \
+  -DeviceId "YOUR_DEVICE_ID"
+```
+
+See [Android quickstart](docs/ANDROID_QUICKSTART.md) for troubleshooting and APK installation instructions.
+
+## Run on an Android Emulator
+
+Start an emulator from Android Studio Device Manager, copy its ID from `flutter devices`, and run:
+
+```powershell
+.\scripts\run_android.ps1 -DeviceId "emulator-5554" -Emulator
+```
+
+The Android emulator uses `http://10.0.2.2:8080` to reach the backend running on the computer.
+
+## Helper Scripts
+
+Start the backend:
+
+```powershell
+.\scripts\run_backend.ps1
+```
+
+Start the web application:
+
+```powershell
+.\scripts\run_web.ps1
+```
+
+Run these scripts in separate terminals when using Gemini.
+
+## Build Outputs
+
+Build an APK for a USB-connected physical phone:
+
+```powershell
+flutter build apk --debug --dart-define=API_BASE_URL=http://127.0.0.1:8080
+```
+
+The APK is generated at:
+
+```text
+build/app/outputs/flutter-apk/app-debug.apk
+```
+
+Build for an Android emulator:
 
 ```powershell
 flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8080
+```
+
+Build the web application:
+
+```powershell
 flutter build web --dart-define=API_BASE_URL=https://your-secured-backend.example
 ```
 
-## What works
+Serve the existing compiled web build locally:
 
-| Feature | Implemented behavior |
-|---|---|
-| Financial digital twin | Editable income, living expenses, existing EMIs, savings, dependents, cover and self-reported score; shared reactive state; local persistence |
-| Goal-to-product | Optional Gemini intent/budget extraction with validated output; local parser and explicit fallback without AI; editable goals and illustrative finance catalogue |
-| Affordability | Reducing-balance EMI, debt-to-income, disposable cash, emergency buffer after down payment, explicit risk reasons |
-| Explainable loan advisor | Live costs and plain-language local explanations; Gemini expands the conversation when enabled |
-| What-if simulator | Down payment, tenure, annual rate and income-loss stress controls; tenure comparison chart |
-| Document intelligence | Local labelled TXT/CSV parser; Gemini PDF/PNG/JPEG extraction up to 5 MB; no invented local fields |
-| Smart autofill | Extract → correct/review → confirm → profile/application; extraction is never described as KYC verification |
-| Eligibility | Transparent heuristic fit labels, not lender approval percentages |
-| Insurance gap | Existing health/life cover compared against clearly labelled illustrative planning assumptions |
-| Claim copilot | Policy/treatment details, dated claim draft, self-reported document checklist, optional Gemini drafting, saved local tracker |
-| Scam detector | Local pattern flags for credentials, advance payments, urgency, guarantee claims and suspicious channels; no “safe” certification |
-| Multilingual voice | Device/browser speech-to-text and read-aloud; English, Hindi, Marathi, Tamil, Telugu selection; Gemini multilingual replies; local English/Hindi starter responses |
-| Explain my contract | Local clause scan and optional Gemini explanation of pasted text; a sample contract is bundled |
-| Consent dashboard | Enforced document/AI/voice consent, processing activity log, local export, deletion and reset |
-| Human escalation | Reviewable, copyable advisor summary with profile, risks and recent conversation; no live advisor connection |
-| Application journey | Review gate, immutable submitted snapshot, JSON export, manually advanced demo stages |
-
-## The demo story (5–7 minutes)
-
-1. **Overview:** introduce the financial twin. Enter “I want to buy a bike for 1.5 lakh”.
-2. **Plan & compare:** adjust tenure/down payment. Drop income by 30–50% to reveal budget stress. Explain why a smaller EMI does not always mean lower total cost.
-3. **Documents:** choose **Try a sample payslip**. Click **Review**, correct a value, then **Confirm & autofill**. Show the updated profile and application preview.
-4. **Your journey:** review the numbers, tick the acknowledgement and create a demo application. Advance the stages. Show that editing the profile later does not rewrite the application snapshot.
-5. **Insurance claims:** fill the sample, pick the documents you have, save the draft, and copy it. The demo tracker is explicitly simulated.
-6. **AI assistant:** ask “Can I afford this EMI?”; then use the sample in **Scam check** and **Explain my contract**. With a key and consent, request Gemini explanation or speak a question.
-7. **Privacy:** show exactly which access was logged, revoke AI consent, export local data, and explain the advisor handoff draft.
-
-## Project structure
-
-```text
-lib/
-  main.dart                      # Bootstrap + restore local state
-  app.dart                       # Responsive shell and navigation
-  domain/
-    models.dart                  # Profile, goal, document and event models
-    finance_engine.dart          # Pure calculations, intent/risk heuristics
-    document_parser.dart         # Conservative local field extraction
-    local_advisor.dart           # Honest no-key conversational guide
-  data/
-    app_store.dart               # Shared state, persistence, consent, snapshots
-    ai_service.dart              # HTTP adapter to Dart backend
-  features/
-    home/ planner/ documents/ claims/
-    assistant/ journey/ profile/ privacy/
-  ui/
-    theme.dart                   # Colour, typography, INR formatting
-    components.dart              # Shared panels, responsive layouts, artwork
-backend/
-  bin/server.dart                # dart:io proxy; .env loader; Gemini REST calls
-  .env.example                   # Safe config template
-assets/samples/                  # Fictional payslip and loan contract
-test/                           # Calculation, parsing, state and widget tests
-docs/                           # Architecture and feature boundaries
+```powershell
+dart tool/serve_web.dart
 ```
 
-## Calculations and boundaries
+Then open `http://127.0.0.1:5180`.
 
-- `EMI = P × r × (1+r)^n / ((1+r)^n − 1)`; zero-rate EMI is `P/n`. `r` is annual percentage / 1200.
-- Total interest = EMI × months − principal. Purchase outlay adds the down payment. Simulator totals exclude fees, taxes and premiums; catalogue cards show their illustrative processing fee separately.
-- Demo affordability limits: **all EMIs ≤ 35% of net income**, retain **20% of monthly income**, keep **3 months of living expenses + all EMIs** after the down payment. These are product-demo assumptions, not universal advice or lender underwriting.
-- Emergency buffer = max(0, savings − down payment) / (living expenses + existing EMI + proposed EMI).
-- Product names/rates are fictional. No lender, credit bureau, bank, KYC vendor, insurer or human advisor is connected. There is no payment movement, real submission, approval or disbursal.
-- Health coverage benchmark: ₹5 lakh × household count. Life benchmark: 10 × annual net income if there are dependents. Both are simplified demo rules, not individual advice.
-- TXT/CSV intake expects one labelled field per line (see `assets/samples/payslip.txt`); arbitrary bank transaction tables are not locally categorised. Gemini handles unstructured PDFs/images, subject to extraction review.
-- Voice requires browser/device support, permission and installed language services. Chrome/Android are preferred demo targets; browser speech may need internet. iOS scaffolding is supplied, but requires validation on macOS.
-- Original uploaded bytes are not persisted by the app or backend. Extracted fields, profile, drafts and chat are stored **unencrypted** in SharedPreferences/browser storage. Use fictional data. Gemini and device speech providers have their own processing/retention policies.
-- Future production work: authentication, encrypted storage, data lifecycle controls, monitored/audited backend, rate limiting, financial partner APIs, robust document/KYC validation, formal risk review and real advisor routing. This is intentionally a hackathon prototype.
+Local HTTP is enabled only in the Android debug configuration. Production builds should use an authenticated HTTPS backend.
 
-## Validate
+## Suggested Demo Flow
+
+1. On **Overview**, enter `I want to buy a bike for 1.5 lakh`.
+2. Open **Plan & compare** and adjust the down payment, tenure and interest rate.
+3. Apply an income reduction to demonstrate financial stress and affordability warnings.
+4. Open **Documents**, load the sample payslip, review a field and confirm autofill.
+5. Open **Your journey**, acknowledge the prototype notice and create a demo application.
+6. Open **Insurance claims**, prepare a claim draft and review its checklist.
+7. Open **AI assistant** and try the EMI question, scam sample and contract sample.
+8. Open **Privacy & consent** to show access history, export and consent revocation.
+
+## Backend API
+
+| Route | Purpose |
+|---|---|
+| `GET /health` | Reports server and Gemini configuration status |
+| `POST /api/goal` | Extracts goal category and explicitly stated budget |
+| `POST /api/chat` | Provides contextual multilingual financial explanations |
+| `POST /api/extract` | Extracts allowlisted fields from supported documents |
+| `POST /api/contract` | Explains pasted financial contract text |
+| `POST /api/claim` | Improves a structured insurance claim draft |
+
+The backend checks consent, origin, request size, route contract and supported document fields. It does not persist request bodies or original document bytes.
+
+## Financial Calculations
+
+Reducing-balance EMI:
+
+```text
+EMI = P × r × (1 + r)^n / ((1 + r)^n − 1)
+```
+
+Where:
+
+- `P` is the principal after down payment.
+- `r` is the monthly interest rate.
+- `n` is the repayment period in months.
+- A zero-interest loan uses `P / n`.
+
+Prototype affordability assumptions:
+
+- Total monthly EMIs should remain at or below 35% of net income.
+- At least 20% of monthly income should remain after expenses and EMIs.
+- Savings after down payment should cover at least three months of expenses and EMIs.
+- Emergency buffer equals remaining savings divided by monthly expenses and total EMIs.
+
+These assumptions are used to demonstrate explainability and are not universal lending rules.
+
+## Testing and Validation
+
+Run all checks from the project root:
 
 ```powershell
 flutter analyze
@@ -135,12 +399,54 @@ dart run backend/test/server_smoke.dart
 flutter build web
 ```
 
-See `docs/VERIFICATION.md` for the checks actually run during implementation, including platform limitations.
+The verified implementation currently includes:
 
-## Technical references
+- 25 passing Flutter unit, state and widget tests.
+- 8 passing backend smoke checks.
+- Clean Flutter static analysis.
+- Successful Android debug APK and Flutter web builds.
+- Physical-device checks on Android 16.
+
+See [verification record](docs/VERIFICATION.md) for the full test scope and known platform limitations.
+
+## Privacy and Safety Boundaries
+
+- Use fictional data when demonstrating the prototype.
+- Original uploaded bytes are processed in memory and are not saved by the app or backend.
+- Extracted values, profile data, chat, claims and demo applications are stored unencrypted in local prototype storage.
+- AI, document and voice permissions are independently controlled.
+- AI consent is checked before sending a request and again before accepting its result.
+- Document fields must be reviewed before autofill.
+- Gemini is not used to calculate EMI or make final approval decisions.
+- Product names, interest rates and processing fees are illustrative.
+- No real KYC, payment, lender submission, insurance submission, approval or disbursal occurs.
+
+## Production Roadmap
+
+Before using real financial data, the project should add:
+
+- Authentication and role-based access control.
+- Encrypted device and server-side storage.
+- HTTPS deployment, rate limiting and secret management.
+- Consent lifecycle, retention and deletion policies.
+- Reliable document provenance, confidence and reconciliation.
+- Regulated KYC, Account Aggregator, credit bureau, lender and insurer integrations.
+- Provider-driven application and claim status events.
+- Monitoring, audit controls and formal security review.
+- Real human-advisor routing and service-level tracking.
+
+## Additional Documentation
+
+- [Architecture and extension guide](docs/ARCHITECTURE.md)
+- [Android quickstart](docs/ANDROID_QUICKSTART.md)
+- [Verification record](docs/VERIFICATION.md)
+- [Technical approach diagram](docs/pitch_assets/technical_approach.jpg)
+- [Workflow and technology stack diagram](docs/pitch_assets/finpath_workflow_and_stack.jpg)
+
+## Technical References
 
 - [Flutter documentation](https://docs.flutter.dev/)
 - [Gemini GenerateContent API](https://ai.google.dev/api/generate-content)
-- [Gemini model catalogue](https://ai.google.dev/gemini-api/docs/models)
-- [speech_to_text platform requirements](https://pub.dev/packages/speech_to_text)
-- [flutter_tts platform requirements](https://pub.dev/packages/flutter_tts)
+- [Gemini model documentation](https://ai.google.dev/gemini-api/docs/models)
+- [speech_to_text package requirements](https://pub.dev/packages/speech_to_text)
+- [flutter_tts package requirements](https://pub.dev/packages/flutter_tts)
