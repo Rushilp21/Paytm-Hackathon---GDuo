@@ -18,6 +18,16 @@ class FinanceProfile {
     this.lifeCover = 1000000,
   });
   double get surplus => income - expenses - existingEmi;
+  FinanceProfile copyWith({
+    double? income,
+    double? expenses,
+    double? savings,
+  }) => FinanceProfile.fromJson({
+    ...toJson(),
+    'income': income ?? this.income,
+    'expenses': expenses ?? this.expenses,
+    'savings': savings ?? this.savings,
+  });
   Map<String, dynamic> toJson() => {
     'name': name,
     'email': email,

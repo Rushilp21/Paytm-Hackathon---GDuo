@@ -43,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
     widget.store.updateProfile(FinanceProfile.fromJson(data));
     toast(
       context,
-      'Your financial twin is updated. All planning tools now use these values.',
+      'Profile updated. Planning tools recalculated; FIN-GUARD rechecks changes when enabled.',
     );
   }
 
@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
     children: [
       const PageHeading(
         'A clearer picture of you',
-        'Meet your financial twin.',
+        'Your financial starting point.',
         'One profile that keeps your whole journey in sync.',
       ),
       ResponsiveSplit(
@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 FilledButton.icon(
                   onPressed: save,
                   icon: const Icon(Icons.check, size: 18),
-                  label: const Text('Update my financial twin'),
+                  label: const Text('Update my financial profile'),
                 ),
               ],
             ),

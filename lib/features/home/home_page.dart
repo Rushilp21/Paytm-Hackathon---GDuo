@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final s = widget.store;
-    final p = s.profile;
+    final p = s.planningProfile;
     final a = FinanceEngine.assess(p, s.goal);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,6 +91,50 @@ class _HomePageState extends State<HomePage> {
           'Let’s make your next big thing happen.',
           action: const Tag('Your space, your pace', icon: Icons.spa_outlined),
         ),
+        if (s.guardAlert != null) ...[
+          Notice(s.guardAlert!, color: s.protectionActive ? teal : amber),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => widget.navigate(10),
+              child: const Text('Review FIN-GUARD →'),
+            ),
+          ),
+        ],
+        Panel(
+          color: const Color(0xFFEDF3FF),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SectionTitle(
+                'Explore. Stress-test. Protect.',
+                subtitle: 'Your new financial decision toolkit.',
+              ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  FilledButton.icon(
+                    onPressed: () => widget.navigate(8),
+                    icon: const Icon(Icons.alt_route),
+                    label: const Text('FIN-VERSE'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => widget.navigate(9),
+                    icon: const Icon(Icons.bolt_outlined),
+                    label: const Text('FIN-CRASH'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => widget.navigate(10),
+                    icon: const Icon(Icons.shield_outlined),
+                    label: const Text('FIN-GUARD'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
         ResponsiveSplit(
           leftFlex: 7,
           rightFlex: 3,
@@ -184,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                     const SectionTitle(
                       'What’s your next chapter?',
                       subtitle:
-                          'Tell us your goal. We’ll help you connect the dots.',
+                          'Tell FINPATH your goal, and it builds the journey. Illustrated goal journeys with visuals are planned next.',
                     ),
                     TextField(
                       controller: input,
@@ -231,11 +275,10 @@ class _HomePageState extends State<HomePage> {
                             : c.maxWidth >= 150
                             ? 2
                             : 1;
-                        final tileWidth = ((c.maxWidth -
-                                    (count - 1) * 10) /
-                                count)
-                            .clamp(0.0, double.infinity)
-                            .toDouble();
+                        final tileWidth =
+                            ((c.maxWidth - (count - 1) * 10) / count)
+                                .clamp(0.0, double.infinity)
+                                .toDouble();
                         final goals = [
                           'Buy a bike',
                           'Buy a car',

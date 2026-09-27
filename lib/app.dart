@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'data/app_store.dart';
 import 'data/ai_service.dart';
@@ -9,6 +10,9 @@ import 'features/assistant/assistant_page.dart';
 import 'features/journey/journey_page.dart';
 import 'features/profile/profile_page.dart';
 import 'features/privacy/privacy_page.dart';
+import 'features/finverse/finverse_page.dart';
+import 'features/crash/crash_page.dart';
+import 'features/guard/guard_page.dart';
 import 'ui/components.dart';
 import 'ui/theme.dart';
 
@@ -31,9 +35,10 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   int page = 0;
   final ai = AiService();
+  Timer? protectionTimer;
   static const labels = [
     'Overview',
     'Plan & compare',
@@ -43,6 +48,9 @@ class _AppShellState extends State<AppShell> {
     'Your journey',
     'Privacy & consent',
     'Financial profile',
+    'FIN-VERSE',
+    'FIN-CRASH',
+    'FIN-GUARD',
   ];
   static const icons = [
     Icons.grid_view_rounded,
@@ -53,13 +61,34 @@ class _AppShellState extends State<AppShell> {
     Icons.route_outlined,
     Icons.shield_outlined,
     Icons.person_outline,
+    Icons.alt_route_rounded,
+    Icons.bolt_outlined,
+    Icons.health_and_safety_outlined,
   ];
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    protectionTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => widget.store.refreshProtection(),
+    );
     ai.health().then((ready) {
       if (mounted) setState(() => widget.store.aiReady = ready);
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) widget.store.refreshProtection();
+  }
+
+  @override
+  void dispose() {
+    protectionTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    ai.client.close();
+    super.dispose();
   }
 
   void navigate(int value) {
@@ -217,123 +246,132 @@ class _AppShellState extends State<AppShell> {
         JourneyPage(store: s, navigate: navigate),
         PrivacyPage(store: s, ai: ai),
         ProfilePage(store: s),
+        FinversePage(store: s, navigate: navigate),
+        CrashPage(store: s, navigate: navigate),
+        GuardPage(store: s),
       ];
       return Scaffold(
         drawer: wide ? null : Drawer(child: sidebar(drawer: true)),
-        body: Row(
-          children: [
-            if (wide) sidebar(),
-            Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 82,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      border: Border(bottom: BorderSide(color: line)),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: wide ? 36 : 16),
-                    child: Row(
-                      children: [
-                        if (!wide)
-                          Builder(
-                            builder: (context) => IconButton(
-                              tooltip: 'Open navigation',
-                              onPressed: () =>
-                                  Scaffold.of(context).openDrawer(),
-                              icon: const Icon(Icons.menu_rounded),
-                            ),
-                          ),
-                        if (wide) ...[
-                          const Text(
-                            'Workspace',
-                            style: TextStyle(fontSize: 12, color: muted),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 13),
-                            child: Text('/', style: TextStyle(color: line)),
-                          ),
-                          Text(
-                            labels[page],
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ] else
-                          Brand(compact: compactHeader),
-                        const Spacer(),
-                        if (MediaQuery.sizeOf(context).width > 520) ...[
-                          Tag(
-                            s.aiReady ? 'Gemini connected' : 'Local demo',
-                            color: s.aiReady ? teal : muted,
-                            icon: Icons.circle,
-                          ),
-                          const SizedBox(width: 17),
-                        ],
-                        if (!compactHeader)
-                          IconButton(
-                            tooltip: 'Your journey',
-                            onPressed: () => navigate(5),
-                            icon: const Icon(
-                              Icons.notifications_none_rounded,
-                              size: 22,
-                            ),
-                          ),
-                        SizedBox(width: compactHeader ? 4 : 12),
-                        InkWell(
-                          onTap: () => navigate(7),
-                          borderRadius: BorderRadius.circular(30),
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: const Color(0xFFF4DFC5),
-                            child: Text(
-                              s.profile.name.isEmpty
-                                  ? 'F'
-                                  : s.profile.name[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Color(0xFF906439),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
+        body: SafeArea(
+          bottom: false,
+          child: Row(
+            children: [
+              if (wide) sidebar(),
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      height: 82,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        border: Border(bottom: BorderSide(color: line)),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: wide ? 36 : 16),
+                      child: Row(
+                        children: [
+                          if (!wide)
+                            Builder(
+                              builder: (context) => IconButton(
+                                tooltip: 'Open navigation',
+                                onPressed: () =>
+                                    Scaffold.of(context).openDrawer(),
+                                icon: const Icon(Icons.menu_rounded),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      key: ValueKey(page),
-                      padding: EdgeInsets.all(wide ? 34 : 20),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 1320),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (s.persistenceError != null) ...[
-                                Notice(s.persistenceError!, color: amber),
-                                const SizedBox(height: 16),
-                              ],
-                              pages[page],
-                              const SizedBox(height: 30),
-                              const Center(
-                                child: Text(
-                                  'Made for your next chapter.  •  FINPATH prototype',
-                                  style: TextStyle(fontSize: 10, color: muted),
+                          if (wide) ...[
+                            const Text(
+                              'Workspace',
+                              style: TextStyle(fontSize: 12, color: muted),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 13),
+                              child: Text('/', style: TextStyle(color: line)),
+                            ),
+                            Text(
+                              labels[page],
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ] else
+                            Brand(compact: compactHeader),
+                          const Spacer(),
+                          if (MediaQuery.sizeOf(context).width > 520) ...[
+                            Tag(
+                              s.aiReady ? 'Gemini connected' : 'Local demo',
+                              color: s.aiReady ? teal : muted,
+                              icon: Icons.circle,
+                            ),
+                            const SizedBox(width: 17),
+                          ],
+                          if (!compactHeader)
+                            IconButton(
+                              tooltip: 'Your journey',
+                              onPressed: () => navigate(5),
+                              icon: const Icon(
+                                Icons.notifications_none_rounded,
+                                size: 22,
+                              ),
+                            ),
+                          SizedBox(width: compactHeader ? 4 : 12),
+                          InkWell(
+                            onTap: () => navigate(7),
+                            borderRadius: BorderRadius.circular(30),
+                            child: CircleAvatar(
+                              radius: 18,
+                              backgroundColor: const Color(0xFFF4DFC5),
+                              child: Text(
+                                s.profile.name.isEmpty
+                                    ? 'F'
+                                    : s.profile.name[0].toUpperCase(),
+                                style: const TextStyle(
+                                  color: Color(0xFF906439),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                            ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        key: ValueKey(page),
+                        padding: EdgeInsets.all(wide ? 34 : 20),
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1320),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (s.persistenceError != null) ...[
+                                  Notice(s.persistenceError!, color: amber),
+                                  const SizedBox(height: 16),
+                                ],
+                                pages[page],
+                                const SizedBox(height: 30),
+                                const Center(
+                                  child: Text(
+                                    'Made for your next chapter.  •  FINPATH prototype',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: muted,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         bottomNavigationBar: wide
             ? null

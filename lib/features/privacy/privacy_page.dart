@@ -41,7 +41,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
       builder: (c) => AlertDialog(
         title: const Text('Reset this demo?'),
         content: const Text(
-          'This removes saved documents, chats, applications, claim drafts and consent history on this device, then restores the fictional sample profile.',
+          'This removes saved documents, chats, applications, claims, future comparisons, recovery schedules and consent history on this device, then restores the fictional sample profile.',
         ),
         actions: [
           TextButton(
@@ -107,6 +107,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
                       'Microphone & voice services',
                       'Use your browser or device speech service to transcribe your voice and read replies. Audio processing may use the platform provider’s cloud.',
                       Icons.mic_none_rounded,
+                      teal,
+                    ),
+                    const SizedBox(height: 22),
+                    _permission(
+                      'guard',
+                      'FIN-GUARD local monitoring',
+                      'Recheck saved profile, goal and schedule changes locally. Recovery actions require separate approval. Revoking this ends active local protection. No background bank access.',
+                      Icons.health_and_safety_outlined,
                       teal,
                     ),
                     const SizedBox(height: 22),

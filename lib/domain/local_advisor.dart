@@ -11,6 +11,15 @@ class LocalAdvisor {
     final a = FinanceEngine.assess(profile, goal);
     final q = question.toLowerCase();
     final hindi = language.startsWith('hi');
+    if (RegExp(r'fin.?verse|five futures|alternate future').hasMatch(q)) {
+      return 'Open FIN-VERSE from Home or the navigation menu to compare Security-first, Balanced, Growth, Entrepreneurial and Wealth-building paths. Adjust income growth, inflation, market loss and job-loss duration. The projections show consequences under stated assumptions, not guaranteed returns.';
+    }
+    if (RegExp(r'fin.?crash|crash test|job loss').hasMatch(q)) {
+      return 'FIN-CRASH combines lost income, a rate rise and an emergency cost. It shows cash month by month, the first unfunded month and safe EMI during and after the shock. Open FIN-CRASH to stress-test the current proposed loan.';
+    }
+    if (RegExp(r'fin.?guard|protection mode|recovery plan').hasMatch(q)) {
+      return 'FIN-GUARD monitors updates you make inside FINPATH. Add recurring payments, enable local monitoring and review a 90-day plan. You choose actions and approve before local schedules and the planning budget change. Real mandate changes and EMI-date requests still need the provider.';
+    }
     if (RegExp(r'claim|hospital|दावा').hasMatch(q)) {
       return hindi
           ? 'बीमा दावे के लिए Insurance claims खोलें। पॉलिसी नंबर, अस्पताल, इलाज की तारीख और बिल की राशि भरें। बिल, डिस्चार्ज सारांश और पॉलिसी की जाँच करें। यह स्थानीय ड्राफ्ट है; बीमाकर्ता को नहीं भेजा जाता।'

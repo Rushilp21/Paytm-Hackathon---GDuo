@@ -86,7 +86,11 @@ class _PlannerPageState extends State<PlannerPage> {
   Widget build(BuildContext context) {
     final s = widget.store;
     final g = s.goal;
-    final a = FinanceEngine.assess(s.profile, g, incomeDrop: incomeDrop);
+    final a = FinanceEngine.assess(
+      s.planningProfile,
+      g,
+      incomeDrop: incomeDrop,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -413,7 +417,10 @@ class _PlannerPageState extends State<PlannerPage> {
                 ];
                 final fees = [1500, 1000, 500];
                 final proposed = g.copyWith(rate: rates[i]);
-                final result = FinanceEngine.assess(s.profile, proposed);
+                final result = FinanceEngine.assess(
+                  s.planningProfile,
+                  proposed,
+                );
                 return SizedBox(
                   width: (c.maxWidth - (cols - 1) * 18) / cols,
                   child: Panel(
@@ -461,7 +468,10 @@ class _PlannerPageState extends State<PlannerPage> {
                         ),
                         _cost(
                           'Heuristic fit',
-                          FinanceEngine.eligibility(s.profile, proposed),
+                          FinanceEngine.eligibility(
+                            s.planningProfile,
+                            proposed,
+                          ),
                         ),
                         const SizedBox(height: 17),
                         SizedBox(

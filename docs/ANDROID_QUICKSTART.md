@@ -1,5 +1,23 @@
 # Run FINPATH on Android
 
+## Updating to the FIN-VERSE / FIN-CRASH / FIN-GUARD build
+
+Opening an already-installed APK does **not** fetch source-code changes. Install the newly built `build/app/outputs/flutter-apk/app-debug.apk` over the existing app, or connect the phone and rerun the launch script. Do not uninstall or clear app data if you want to retain your saved profile.
+
+From PowerShell in the project folder:
+
+```powershell
+.\scripts\run_android.ps1 -DeviceId "33c8cb3b"
+```
+
+From Git Bash:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "./scripts/run_android.ps1" -DeviceId "33c8cb3b"
+```
+
+Use the current ID from `flutter devices` if it changes. All three new features work without the backend. After installation, open their shortcuts on Home or their menu entries. Follow the [five-minute USP demo](RESILIENCE_GUIDE.md#a-five-minute-demo), including budget schedules, income change and explicit protection approval.
+
 ## 1. Open the project
 
 Open `C:\Users\Rushil\OneDrive\Documents\ChatGPT\Paytm` in Android Studio or VS Code. Open the whole Flutter project, not just its `android` folder.

@@ -43,7 +43,11 @@ class _JourneyPageState extends State<JourneyPage> {
     final s = widget.store;
     final app = s.application;
     final g = app == null ? s.goal : FinancialGoal.fromJson(app['goal']);
-    final p = app == null ? s.profile : FinanceProfile.fromJson(app['profile']);
+    final p = app == null
+        ? s.planningProfile
+        : FinanceProfile.fromJson(
+            app['profile'],
+          ).copyWith(expenses: (app['planningExpenses'] as num?)?.toDouble());
     final a = FinanceEngine.assess(p, g);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

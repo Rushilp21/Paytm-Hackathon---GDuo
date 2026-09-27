@@ -70,16 +70,17 @@ class _AssistantPageState extends State<AssistantPage> {
     try {
       String answer;
       if (s.consent['ai'] == true) {
-        final a = FinanceEngine.assess(s.profile, s.goal);
+        final a = FinanceEngine.assess(s.planningProfile, s.goal);
         s.log(
           'Gemini conversation',
           'Sent question, financial profile (without name/email/employer), goal, calculations and recent messages for a reply',
         );
         s.save();
-        final profileContext = Map<String, dynamic>.from(s.profile.toJson())
-          ..remove('name')
-          ..remove('email')
-          ..remove('employer');
+        final profileContext =
+            Map<String, dynamic>.from(s.planningProfile.toJson())
+              ..remove('name')
+              ..remove('email')
+              ..remove('employer');
         final data = await widget.ai.request('chat', {
           'consent': true,
           'message': text,
@@ -112,7 +113,7 @@ class _AssistantPageState extends State<AssistantPage> {
         answer = '${data['answer']}\n\n— Gemini • check important details';
       } else {
         answer =
-            '${LocalAdvisor.answer(text, s.profile, s.goal, s.language)}\n\n— Local guide • rule-based';
+            '${LocalAdvisor.answer(text, s.planningProfile, s.goal, s.language)}\n\n— Local guide • rule-based';
       }
       s.chat(ChatMessage(answer));
     } catch (e) {

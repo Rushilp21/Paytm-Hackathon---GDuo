@@ -1,5 +1,23 @@
 # Verification record
 
+## Resilience update — 27 September 2026
+
+- `flutter analyze --no-pub --no-version-check`: **no issues found**.
+- `flutter test --no-pub --reporter expanded`: **46 tests passed**.
+- `flutter build apk --debug --no-pub --dart-define=API_BASE_URL=http://127.0.0.1:8080`: **Android debug APK built successfully**.
+- `flutter build web --no-pub --no-wasm-dry-run --dart-define=API_BASE_URL=http://127.0.0.1:8080`: **web release built successfully**.
+- No Android phone was connected during this update; physical-device runtime testing of the new screens is still to be done. The earlier device check below applies to the earlier build.
+
+New coverage verifies identical starting states and conservation of funds across strategies, job/market shocks, deficit accounting, zero-shock equivalence, loan maturity, weakest-case search, invalid values, budget category validation, monitoring consent, explicit approval, idempotent activation, stale proposals, expiry, revocation, persistence, immutable saved comparisons, legacy storage migration and reset. Widget checks exercise all three pages at 320 and 1200 pixels, budget/schedule and income dialogs, approval/activation, and home navigation at 390 pixels. A real narrow-dialog dropdown overflow was reproduced and fixed.
+
+The new financial engines make no external API calls. Gemini, live microphones and external financial providers were not exercised as part of this update. See [the resilience guide](RESILIENCE_GUIDE.md) for execution scope and formulas.
+
+The compiled web release was served locally and visually checked at desktop width. FIN-VERSE rendered its five curves, assumptions, strategy cards and exact yearly table; FIN-CRASH rendered its combined-shock summary, cash-flow chart and monthly table; FIN-GUARD rendered monitoring consent, the budget/schedule dialog, recovery proposal and disabled-until-approved action. No layout exception appeared. The temporary preview server was stopped afterward.
+
+The unchanged backend smoke-check command was attempted again, but the local `dart` launcher stalled before emitting output and was stopped. The earlier eight-check result below remains the most recent completed backend verification; no backend source changed in this update.
+
+## Earlier build — 24 September 2026
+
 Environment: Windows, Flutter 3.41.6, Dart 3.11.4. Verified on 24 September 2026.
 
 ## Completed checks
